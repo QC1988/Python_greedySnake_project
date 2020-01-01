@@ -1,0 +1,203 @@
+#coding=utf-8
+import tkinter as tk
+from tkinter.ttk import *
+
+
+import pygame, sys, random, math
+# 这个模块包含各种pygame所使用的常量
+from pygame.locals import *
+
+# 1.定义颜色变量
+# 0-255 0黑色 255白色
+redColor = pygame.Color(255, 0, 0)
+# 背景为黑色
+blackColor = pygame.Color(0, 0, 0)
+# 背景为绿色
+# blackColor = pygame.Color(0, 80, 0)
+# 贪吃蛇是白色
+whiteColor = pygame.Color(255, 255, 255)
+
+
+# 2.定义游戏结束的函数
+def GameOver():
+    pygame.quit()
+    pygame.font.quit()
+    pygame.display.init()
+    sys.exit()
+
+
+# 3.定义main函数,定义入口函数
+def Main():
+
+    # 3.1 初始化pygame
+    pygame.init()
+    # 初始化文字显示功能
+    pygame.font.init()
+    # 初始化显示功能
+    pygame.display.init()
+
+    # 3.2 定义一个变量来控制速度
+    fpsClock = pygame.time.Clock()
+
+    # 3.3 创建pygame显示层，说白了创建一个界面
+    playSurface = pygame.display.set_mode((640, 640))
+    # 游戏窗口名
+    pygame.display.set_caption('贪吃蛇')
+    # 初始化游戏得分
+    score = 0
+
+    # 3.4 初始化变量
+    # 初始化贪吃蛇的起始坐标位置，我们以（x,y）为基准，左上角为原点
+    x = 100
+    y = 100
+    snakePosition = [x, y]
+    # 初始化贪吃蛇长度，列表中有个几个元素就代表有几段身体，snakeBodyNum段身体
+    snakeBodyNum = 3
+    # 蛇每节身体边长snakeBodyLength
+    snakeBodyLength = 20
+    # 实际显示蛇每节身体的边长，需小于等于snakeBodyLength，否则每节身体就会相交
+    snakeBodyLengthShow = 18
+    # 贪吃蛇身体是否空心
+    hollow = True
+    #hollow = False
+
+    # 生成组成贪吃蛇身体的二维数组[[0,0],[0,0]...]
+    snakeBody = [[0 for i in range(2)] for j in range(snakeBodyNum)]
+    # 给贪吃蛇身体赋值，确定每节身体的初始位置
+    for a in range(snakeBodyNum):
+        for b in range(2):
+            if b == 0:
+                snakeBody[a][b] = (x - a * snakeBodyLength)
+            else:
+                snakeBody[a][b] = y
+
+
+    # 初始化目标方块的位置
+    targetPosition = [300, 300]
+    # 目标方块的标记 目的：判断是否吃掉了这个方块，1没有吃掉，0吃掉
+    targetFlag = 1
+    # 初始化方向
+    direction = 'right'
+    # 定义一个方向变量（人为控制， 按键有关系）
+    changeDirection = direction
+    # 定义暂停flag
+    pause = 0
+
+    # 3.5 主循环
+    while True:
+        # 控制游戏速度，设定随着得分增加速度会变快
+        fpsClock.tick(2 + score/2)
+        # 从队列中获取事件
+        flag = 0
+        # 下面这部分需要去pygame查看一下函数的定义和用法,不然理解不了
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.font.quit()
+                pygame.display.quit()
+                pygame.quit()
+                sys.exit()
+            # 监听按键按下
+            elif event.type == KEYDOWN:
+                if event.key == K_RIGHT:
+                    changeDirection = 'right'
+                if event.key == K_LEFT:
+                    changeDirection = 'left'
+                if event.key == K_UP:
+                    changeDirection = 'up'
+                if event.key == K_DOWN:
+                    changeDirection = 'down'
+                if event.key == K_ESCAPE:
+                    pygame.event.post(pygame.event.Event(QUIT))
+
+                # 增加暂停键p键
+                if event.key == K_p:
+                    pause = ~pause
+                    while pause:
+                        # 不加这句没法重置key的状态
+                        for event in pygame.event.get():
+                            if event.type == KEYDOWN:
+                                if event.key == K_p:
+                                    pause = ~pause
+                                    flag = 1
+
+        # 3.6 确定方向
+        if changeDirection == 'left' and not direction == 'right':
+            direction = changeDirection
+        if changeDirection == 'right' and not direction == 'left':
+            direction = changeDirection
+        if changeDirection == 'up' and not direction == 'down':
+            direction = changeDirection
+        if changeDirection == 'down' and not direction == 'up':
+            direction = changeDirection
+
+        # 3.7 根据方向移动蛇头
+        if direction == 'right':
+            snakePosition[0] += snakeBodyLength
+        if direction == 'left':
+            snakePosition[0] -= snakeBodyLength
+        if direction == 'up':
+            snakePosition[1] -= snakeBodyLength
+        if direction == 'down':
+            snakePosition[1] += snakeBodyLength
+
+        # 3.8 蛇的移动
+        snakeBody.insert(0, list(snakePosition))
+
+        # 如果我们的贪吃蛇的位置和目标方块的位置重合 意味着蛇吃掉它了 目标方块为0
+        if snakePosition[0] == targetPosition[0] and snakePosition[1] == targetPosition[1]:
+            targetFlag = 0
+            score += 1
+        else:
+            snakeBody.pop()
+
+        if targetFlag == 0:
+            x = random.randrange(1, 32)
+            y = random.randrange(1, 24)
+            targetPosition = [int(x*20), int(y*20)]
+            targetFlag = 1
+
+        # 3.9 填充背景颜色
+        playSurface.fill(blackColor)
+        for position in snakeBody:
+            # 第一个参数surface：指定一个surface编辑区，在这个区域内绘制，界面
+            # 第二个参数color:颜色
+            # 第三个参数Rect:返回一个矩形（（x，y），（width，height））
+            # 第四个参数width:线条的粗细 width = 0 填充（实心儿）  width=1(空心)
+            # 画蛇
+            pygame.draw.rect(playSurface, whiteColor, Rect(position[0], position[1], snakeBodyLengthShow, snakeBodyLengthShow), hollow)
+            # 画目标方块
+            pygame.draw.ellipse(playSurface, redColor, Rect(targetPosition[0], targetPosition[1], 18, 18), 1)
+        # 画得分和速度显示区
+        pygame.draw.rect(playSurface, whiteColor, Rect(0, 480, 640, 160))
+        # 增加score,speed,exit和pause
+        font = pygame.font.Font(None, 30)
+        scoreSurface = font.render("Score:%d" %(score*10), True, (0, 0, 0), None)
+        speedSurface = font.render("Speed:%d" %score, True, (0, 0, 0), None)
+        exitSurface = font.render("Press Esc to exit." , True, (0, 0, 0), None)
+        pauseSurface = font.render("Press P to Pause.", True, (0, 0, 0), None)
+        # 屏幕上画score和speed,exit和pause
+        scoreRect = pygame.draw.rect(scoreSurface, whiteColor, Rect(0, 480, 640, 160))
+        speedRect = pygame.draw.rect(speedSurface, whiteColor, Rect(0, 510, 640, 160))
+        exitRect = pygame.draw.rect(exitSurface, whiteColor, Rect(0, 540, 640, 160))
+        pauseRect = pygame.draw.rect(pauseSurface, whiteColor, Rect(0, 570, 640, 160))
+        playSurface.blit(scoreSurface, scoreRect, area=None, special_flags=0)
+        playSurface.blit(speedSurface, speedRect, area=None, special_flags=0)
+        playSurface.blit(exitSurface, exitRect, area=None, special_flags=0)
+        playSurface.blit(pauseSurface, pauseRect, area=None, special_flags=0)
+
+        # 4 更新显示到屏幕表面
+        pygame.display.flip()
+        # 判断是否游戏结束，超出边界即为死亡
+        if snakePosition[0] >620 or snakePosition[0] < 0:
+            GameOver()
+        elif snakePosition[1] > 460 or snakePosition[1] < 0 :
+            GameOver()
+        if flag == 1:
+            # 修正暂停后的程序加速
+            r = int(500/(math.log2(score+2)))
+            pygame.time.wait(r)
+
+
+# 5 启动入口函数
+if __name__ == '__main__':
+    Main()
