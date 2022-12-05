@@ -57,13 +57,13 @@ def Main():
     snakeBodyLength = 20
     # the actual visible side length should be smaller than (or be equal to) the snakeBodyLength,otherwise the joint of snake body will be mixed
     snakeBodyLengthShow = 18
-    # 贪吃蛇身体是否空心
+    # define the snake is hollow or not
     hollow = True
     #hollow = False
 
-    # 生成组成贪吃蛇身体的二维数组[[0,0],[0,0]...]
+    # initial the 2D array represent the snake[[0,0],[0,0]...]
     snakeBody = [[0 for i in range(2)] for j in range(snakeBodyNum)]
-    # 给贪吃蛇身体赋值，确定每节身体的初始位置
+    # assign value to the body of the snake, define the start coordinate of every joint of the snake
     for a in range(snakeBodyNum):
         for b in range(2):
             if b == 0:
@@ -72,31 +72,31 @@ def Main():
                 snakeBody[a][b] = y
 
 
-    # 初始化目标方块的位置
+    # initial the position of the target block
     targetPosition = [300, 300]
-    # 目标方块的标记 目的：判断是否吃掉了这个方块，1没有吃掉，0吃掉
+    # define the flag which represent the target block, purpose: judge the block has been eaten of not, 1:not 2:eaten
     targetFlag = 1
-    # 初始化方向
+    # initailize the direction of the snake
     direction = 'right'
-    # 定义一个方向变量（人为控制， 按键有关系）
+    # define a variable represent the direction controlled by key(user press the direction key)
     changeDirection = direction
-    # 定义暂停flag
+    # define the pause flag, game pause when flag is 1
     pause = 0
 
-    # 3.5 主循环
+    # 3.5 main loop3.5
     while True:
-        # 控制游戏速度，设定随着得分增加速度会变快
+        # control the game speed, speed up as the point increase
         fpsClock.tick(2 + score/2)
-        # 从队列中获取事件
+        # get event from the queue
         flag = 0
-        # 下面这部分需要去pygame查看一下函数的定义和用法,不然理解不了
+        # codes below can't be understood unless check the define and usage of the function in pygame
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.font.quit()
                 pygame.display.quit()
                 pygame.quit()
                 sys.exit()
-            # 监听按键按下
+            # listen for the key press
             elif event.type == KEYDOWN:
                 if event.key == K_RIGHT:
                     changeDirection = 'right'
@@ -109,18 +109,18 @@ def Main():
                 if event.key == K_ESCAPE:
                     pygame.event.post(pygame.event.Event(QUIT))
 
-                # 增加暂停键p键
+                # add the pause key, p key
                 if event.key == K_p:
                     pause = ~pause
                     while pause:
-                        # 不加这句没法重置key的状态
+                        # add this codes to reset the state of the button
                         for event in pygame.event.get():
                             if event.type == KEYDOWN:
                                 if event.key == K_p:
                                     pause = ~pause
                                     flag = 1
 
-        # 3.6 确定方向
+        # 3.6 confirm the direction
         if changeDirection == 'left' and not direction == 'right':
             direction = changeDirection
         if changeDirection == 'right' and not direction == 'left':
@@ -130,7 +130,7 @@ def Main():
         if changeDirection == 'down' and not direction == 'up':
             direction = changeDirection
 
-        # 3.7 根据方向移动蛇头
+        # 3.7 move the head of the snake according to the direction
         if direction == 'right':
             snakePosition[0] += snakeBodyLength
         if direction == 'left':
@@ -140,10 +140,10 @@ def Main():
         if direction == 'down':
             snakePosition[1] += snakeBodyLength
 
-        # 3.8 蛇的移动
+        # 3.8 the movement of the snake
         snakeBody.insert(0, list(snakePosition))
 
-        # 如果我们的贪吃蛇的位置和目标方块的位置重合 意味着蛇吃掉它了 目标方块为0
+        # it means the snake eat the target block if the position of the snake and target block is same, the position of target block is 0
         if snakePosition[0] == targetPosition[0] and snakePosition[1] == targetPosition[1]:
             targetFlag = 0
             score += 1
@@ -156,7 +156,7 @@ def Main():
             targetPosition = [int(x*20), int(y*20)]
             targetFlag = 1
 
-        # 3.9 填充背景颜色
+        # 3.9 fill the background color
         playSurface.fill(blackColor)
         for position in snakeBody:
             # 第一个参数surface：指定一个surface编辑区，在这个区域内绘制，界面
@@ -198,6 +198,6 @@ def Main():
             pygame.time.wait(r)
 
 
-# 5 启动入口函数
+# 5 the entry of main function
 if __name__ == '__main__':
     Main()
