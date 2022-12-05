@@ -1,24 +1,24 @@
 #coding=utf-8
+
 import tkinter as tk
 from tkinter.ttk import *
-
-
+from pygame.locals import * # this modele include constant which often used
 import pygame, sys, random, math
-# 这个模块包含各种pygame所使用的常量
-from pygame.locals import *
 
-# 1.定义颜色变量
-# 0-255 0黑色 255白色
+
+
+# 1.define color constant
+# 0-255 0 black 255 white
 redColor = pygame.Color(255, 0, 0)
-# 背景为黑色
+# background black
 blackColor = pygame.Color(0, 0, 0)
-# 背景为绿色
+# background green
 # blackColor = pygame.Color(0, 80, 0)
-# 贪吃蛇是白色
+# snake white
 whiteColor = pygame.Color(255, 255, 255)
 
 
-# 2.定义游戏结束的函数
+# 2.define the function to end the game
 def GameOver():
     pygame.quit()
     pygame.font.quit()
@@ -26,36 +26,36 @@ def GameOver():
     sys.exit()
 
 
-# 3.定义main函数,定义入口函数
+# 3.define main function, define the function entry
 def Main():
 
-    # 3.1 初始化pygame
+    # 3.1 initialize pygame
     pygame.init()
-    # 初始化文字显示功能
+    # initialize the display function of charactors
     pygame.font.init()
-    # 初始化显示功能
+    # initialize the display function 
     pygame.display.init()
 
-    # 3.2 定义一个变量来控制速度
+    # 3.2 define a variable to control the global speed
     fpsClock = pygame.time.Clock()
 
-    # 3.3 创建pygame显示层，说白了创建一个界面
+    # 3.3 create pygame display layer , create a window
     playSurface = pygame.display.set_mode((640, 640))
-    # 游戏窗口名
-    pygame.display.set_caption('贪吃蛇')
-    # 初始化游戏得分
+    # game window name label
+    pygame.display.set_caption('Greedysnake')
+    # initialize the point of game
     score = 0
 
-    # 3.4 初始化变量
-    # 初始化贪吃蛇的起始坐标位置，我们以（x,y）为基准，左上角为原点
+    # 3.4 initialize variables
+    # initialize the start coordinate x,y , take upper left as the coordinate origin
     x = 100
     y = 100
     snakePosition = [x, y]
-    # 初始化贪吃蛇长度，列表中有个几个元素就代表有几段身体，snakeBodyNum段身体
+    # initialize the length of the snake, the length of list represent the length of snake, the initial length of sanke is snakeBodyNum
     snakeBodyNum = 3
-    # 蛇每节身体边长snakeBodyLength
+    # the side length of every joint in snake
     snakeBodyLength = 20
-    # 实际显示蛇每节身体的边长，需小于等于snakeBodyLength，否则每节身体就会相交
+    # the actual visible side length should be smaller than (or be equal to) the snakeBodyLength,otherwise the joint of snake body will be mixed
     snakeBodyLengthShow = 18
     # 贪吃蛇身体是否空心
     hollow = True
