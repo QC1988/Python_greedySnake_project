@@ -159,23 +159,23 @@ def Main():
         # 3.9 fill the background color
         playSurface.fill(blackColor)
         for position in snakeBody:
-            # 第一个参数surface：指定一个surface编辑区，在这个区域内绘制，界面
-            # 第二个参数color:颜色
-            # 第三个参数Rect:返回一个矩形（（x，y），（width，height））
-            # 第四个参数width:线条的粗细 width = 0 填充（实心儿）  width=1(空心)
-            # 画蛇
+            # the 1st variable :surface which specify a editing area, drawing interface in this area
+            # the 2nd variable :color 
+            # the 3rd variable :Rect which return a rectangle（（x，y），（width，height））
+            # the 4th variable :width which specify the line thickness, width = 0 fill（solid）  width=1(hollow)
+            # draw the snake
             pygame.draw.rect(playSurface, whiteColor, Rect(position[0], position[1], snakeBodyLengthShow, snakeBodyLengthShow), hollow)
-            # 画目标方块
+            # draw the target block
             pygame.draw.ellipse(playSurface, redColor, Rect(targetPosition[0], targetPosition[1], 18, 18), 1)
-        # 画得分和速度显示区
+        # draw the display area for point and speed
         pygame.draw.rect(playSurface, whiteColor, Rect(0, 480, 640, 160))
-        # 增加score,speed,exit和pause
+        # add score,speed,exit and pause
         font = pygame.font.Font(None, 30)
         scoreSurface = font.render("Score:%d" %(score*10), True, (0, 0, 0), None)
         speedSurface = font.render("Speed:%d" %score, True, (0, 0, 0), None)
         exitSurface = font.render("Press Esc to exit." , True, (0, 0, 0), None)
         pauseSurface = font.render("Press P to Pause.", True, (0, 0, 0), None)
-        # 屏幕上画score和speed,exit和pause
+        # draw score,speed,exit and pause
         scoreRect = pygame.draw.rect(scoreSurface, whiteColor, Rect(0, 480, 640, 160))
         speedRect = pygame.draw.rect(speedSurface, whiteColor, Rect(0, 510, 640, 160))
         exitRect = pygame.draw.rect(exitSurface, whiteColor, Rect(0, 540, 640, 160))
@@ -185,15 +185,15 @@ def Main():
         playSurface.blit(exitSurface, exitRect, area=None, special_flags=0)
         playSurface.blit(pauseSurface, pauseRect, area=None, special_flags=0)
 
-        # 4 更新显示到屏幕表面
+        # 4 refresh the display area
         pygame.display.flip()
-        # 判断是否游戏结束，超出边界即为死亡
+        # judge the game is over or not, game over as the snake goes out of bound
         if snakePosition[0] >620 or snakePosition[0] < 0:
             GameOver()
         elif snakePosition[1] > 460 or snakePosition[1] < 0 :
             GameOver()
         if flag == 1:
-            # 修正暂停后的程序加速
+            # fix the program acceleration after pausing the game
             r = int(500/(math.log2(score+2)))
             pygame.time.wait(r)
 
